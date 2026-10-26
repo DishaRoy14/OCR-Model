@@ -192,7 +192,6 @@ We also tested image enhancement, larger images, line-by-line reading and upscal
 ## Plan to improve accuracy
 
 1. **Fine-tune the model on Bengali and Hindi handwriting.** This is the change most likely to raise handwriting accuracy. It would use public handwriting datasets (for example BN-HTRd for Bengali) and our own pages with typed text, trained on a cloud GPU, and checked on pages the model has never seen.
-2. **Finish the Hindi test set** so Hindi accuracy is measured in the same way.
-3. **Collect more test pages**, so the numbers are more reliable.
-4. **Try a larger model** on stronger hardware, if one becomes available.
-5. **Add a human review step** for handwritten documents, and ask people to photograph pages flat, in even light, with the text filling the frame.
+2. **Collect more test pages**, so the numbers are more reliable.
+3. **Try a larger model** on stronger hardware, if one becomes available.
+4. **Add a human review step** for handwritten documents, and ask people to photograph pages flat, in even light, with the text filling the frame.
