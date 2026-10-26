@@ -1,9 +1,9 @@
 """Error type shared by every file-validation / preprocessing helper.
 
-Rule for the whole ``utils`` package: no raw Pillow or PyMuPDF exception may
+Rule for the whole 'utils' package: no raw Pillow or PyMuPDF exception may
 escape a public function. Every problem with an uploaded file is reported as
-a ``FileValidationError`` so that ``main.py`` can turn it into a clean HTTP
-error with ``HTTPException(status_code=e.status_code, detail=e.detail)``.
+a 'FileValidationError' so that 'main.py' can turn it into a clean HTTP
+error with 'HTTPException(status_code=e.status_code, detail=e.detail)'.
 """
 
 

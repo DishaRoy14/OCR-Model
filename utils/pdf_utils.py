@@ -16,31 +16,31 @@ from __future__ import annotations
 import math
 import os
 
-try:                                    # PyMuPDF >= 1.24 exposes "pymupdf"
+try:                                    
     import pymupdf
-except ImportError:                     # older versions only expose "fitz"
+except ImportError:                    
     import fitz as pymupdf
 
 from .errors import FileValidationError
 from .image_utils import _env_int, prepare_image
 
-# ---------------------------------------------------------------- constants
-MAX_PDF_BYTES = 20 * 1024 * 1024        # 20 MB upload limit
+# constants....
+MAX_PDF_BYTES = 20 * 1024 * 1024       
 DEFAULT_DPI = 150
-MAX_RENDER_SIDE_PX = 4000               # cap rendered page size (A0 posters etc.)
-MAX_RENDER_PIXELS = 16_000_000          # ...and total pixels per page
+MAX_RENDER_SIDE_PX = 4000               
+MAX_RENDER_PIXELS = 16_000_000         
 _PDF_CONTENT_TYPES = {
     "application/pdf", "application/x-pdf",
     "application/octet-stream", "binary/octet-stream",
 }
 
-try:                                    # keep MuPDF's own warnings off the console
+try:                                   
     pymupdf.TOOLS.mupdf_display_errors(False)
-except Exception:                       # pragma: no cover - cosmetic only
+except Exception:                       
     pass
 
 
-# ------------------------------------------------------------------ helpers
+#helpers
 def _effective_dpi(width_pt: float, height_pt: float, dpi: float) -> float:
     """Lower ``dpi`` if the rendered page would exceed the pixel caps.
 
@@ -82,7 +82,7 @@ def _open_pdf(data: bytes):
             )
         if doc.page_count == 0:
             raise FileValidationError(400, "PDF has no pages.")
-        doc.load_page(0)                # make sure the first page is really readable
+        doc.load_page(0)                
     except FileValidationError:
         doc.close()
         raise
@@ -92,7 +92,7 @@ def _open_pdf(data: bytes):
     return doc
 
 
-# --------------------------------------------------------------- public API
+#public API
 def validate_pdf(filename: str, content_type: str, data: bytes) -> None:
     """Validate an uploaded PDF. Raises FileValidationError, returns None.
 

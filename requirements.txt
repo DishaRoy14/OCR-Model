@@ -7,3 +7,4 @@ pymupdf==1.25.1
 pytest==8.3.4
 requests==2.32.3
 jiwer==3.0.5
+python-docx==1.1.2

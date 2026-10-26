@@ -24,6 +24,13 @@ results.csv
 eval/samples/
 uploads/
 tmp/
-
+outputs/
+eval/ocr_out/
 # Logs
 *.log
+
+##csv ,pdfs, docx
+
+*.csv
+*.pdf
+*.docx
