@@ -75,14 +75,14 @@ ocr_model/
 - Built the FastAPI app (`main.py`, `schemas.py`) with image, PDF and Word endpoints and the downloadable `.txt` result.
 - Tuned GPU memory so the 8B model runs 100% on the GPU, and wrote the start scripts.
 - Added Word (.docx) support and its tests.
-- Ran the accuracy tests on the Bengali and English pages and wrote the results.
 
 **Intern 2: Disha**
 - Wrote the file handling in `utils/` (`errors.py`, `image_utils.py`, `pdf_utils.py`): validation, image cleanup and PDF conversion.
 - Wrote the automated tests (more than 70) for these modules.
 - Wrote the evaluation tool `eval/evaluate.py` (CER and WER) and `eval/make_samples.py`.
-- Is preparing the Hindi test set (printed and handwritten pages with typed reference text).
-- Wrote the first version of this README.
+- Prepared the Hindi, Bengali and English test set (printed and handwritten pages with typed reference text).
+- Ran the accuracy tests on the Hindi, Bengali and English pages and wrote the results.
+- Wrote the final version of this README.
 
 ## How to run it
 
