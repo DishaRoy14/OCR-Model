@@ -77,7 +77,7 @@ ocr_model/
 - Added Word (.docx) support and its tests.
 
 **Intern 2: Disha**
-- Wrote the file handling in `utils/` (`errors.py`, `image_utils.py`, `pdf_utils.py`): validation, image cleanup and PDF conversion.
+- Wrote the file handling in `utils/` (`errors.py`, `image_utils.py`, `pdf_utils.py`, `docx_utils.py`): validation, image cleanup and PDF conversion.
 - Wrote the automated tests (more than 70) for these modules.
 - Wrote the evaluation tool `eval/evaluate.py` (CER and WER) and `eval/make_samples.py`.
 - Prepared the Hindi, Bengali and English test set (printed and handwritten pages with typed reference text).
