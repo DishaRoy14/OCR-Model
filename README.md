@@ -168,19 +168,19 @@ Set these before `uvicorn` starts (they are already in `run.ps1`).
 
 ## Results
 
-Each page was compared with text typed by hand from the same image. Hindi averages use the four files that had ground-truth text; one printed page and one handwritten page could not be scored because their ground-truth files were missing. Average processing time was 15.32 seconds per image for Hindi printed pages and 13.58 seconds per image for Hindi handwritten pages.
+Each page was compared with text typed by hand from the same image. All 25 test pages (5 per group) were scored. A page usually takes about 6 to 15 seconds, and the first page after starting the model is slower because the model has to load.
 
-| Document type | Pages | Scored pages | CER | WER | Accuracy (1 − CER) |
-|---|---:|---:|---:|---:|---:|
-| Bengali, printed | 5 | 5 | 0.0035 | 0.0139 | **99.7%** |
-| English, printed | 5 | 5 | 0.0031 | 0.0184 | **99.7%** |
-| Bengali, handwritten | 5 | 5 | 0.0895 | 0.2053 | **91.1%** |
-| Hindi, printed | 5 | 4 | 0.0177 | 0.0679 | **98.2%** |
-| Hindi, handwritten | 5 | 4 | 0.1173 | 0.3392 | **88.3%** |
+| Document type | Pages | CER | WER | Accuracy (1 − CER) |
+|---|---:|---:|---:|---:|
+| Bengali, printed | 5 | 0.0035 | 0.0139 | **99.7%** |
+| English, printed | 5 | 0.0031 | 0.0184 | **99.7%** |
+| Hindi, printed | 5 | 0.0146 | 0.0564 | **98.5%** |
+| Bengali, handwritten | 5 | 0.0895 | 0.2053 | **91.1%** |
+| Hindi, handwritten | 5 | 0.1126 | 0.3047 | **88.7%** |
 
 **CER** (character error rate) is the share of characters the model got wrong, and **WER** (word error rate) is the same for whole words. Lower is better, and accuracy here means 1 − CER.
 
-Handwritten Bengali ranged from about 80% to 99.5% per page, depending on the writer.
+Handwriting varies from page to page, depending on the writer. Handwritten Bengali ranged from about 80% to 99.5% character accuracy per page, and handwritten Hindi from about 81% to 96%. For handwriting, about one word in five (Bengali) to one word in three (Hindi) came out wrong.
 
 ### Why the handwriting results are lower
 
