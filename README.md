@@ -12,6 +12,22 @@ We used a **pretrained vision-language model, Qwen3-VL 8B**, running locally thr
 
 We first trained a small OCR model of our own as a demo. It could only predict a single sentence, so it wasn't usable for real documents. A model that reads real pages, and especially handwriting in Bengali and Hindi, needs a huge amount of labelled data, a lot of GPU time and a lot of money. That wasn't realistic for an internship, so we chose a strong pretrained model and built the full pipeline around it: file checks, preprocessing, the API and the accuracy tests.
 
+### Why we kept Qwen3-VL over Unlimited-OCR-2
+
+We were also asked to try Baidu's **Unlimited-OCR-2**.We installed it on the same laptop (RTX 4060, 8 GB) and ran it on the same English pages as Qwen. Bengali and Hindi were not compared, because Unlimited-OCR-2 does not support them.
+
+| Test (same pages) | Qwen3-VL 8B | Unlimited-OCR-2 |
+|---|---|---|
+| English printed, 5 pages: CER | 0.0031 | 0.0071 |
+| English printed, 5 pages: WER | 0.0184 | 0.0072 |
+| English cursive, 6 pages: CER | 0.0360 | 0.0449 |
+| English cursive, 6 pages: WER | 0.0859 | 0.0971 |
+| Time per page | about 6 s | about 25 s |
+| Peak GPU memory | about 5.5 GB | 7.4 to 7.6 GB |
+| Bengali and Hindi | Supported | Not supported |
+
+On English the two models were about equally accurate. The differences are small with only 5 or 6 pages per test. Qwen was about four times faster, left more GPU memory free, and reads all three languages. Unlimited-OCR-2 is built for reading very long multi-page documents in one pass, which needs more GPU memory than 8 GB. On Windows it also needed a third-party build of Triton to run at all. For these reasons Qwen3-VL stays the main engine. The test scripts and results are in `experiments/`.
+
 ## Project structure
 
 ```
@@ -44,8 +60,10 @@ ocr_model/
 │       ├── bn_hand/         Bengali, handwritten
 │       ├── bn_print/        Bengali, printed
 │       ├── en_print/        English, printed
+│       ├── en_cursive/      English, cursive handwriting
 │       ├── hi_hand/         Hindi, handwritten
 │       └── hi_print/        Hindi, printed
+├── experiments/             Unlimited-OCR-2 comparison scripts and results
 ├── outputs/                 Saved .txt results (cleaned up after 7 days)
 └── results_*.csv            Accuracy results from our test runs
 ```
@@ -63,6 +81,7 @@ ocr_model/
 | `utils/docx_utils.py` | Reads typed text directly from Word files, in order, and pulls out embedded images so they can go through OCR. |
 | `eval/evaluate.py` | Sends test images to the running API and calculates CER and WER per file and per language. Saves a CSV. |
 | `eval/make_samples.py` | Generates test images from known text, to check the evaluation setup. |
+| `experiments/` | Scripts that test Unlimited-OCR-2 on our test pages and score it the same way as Qwen, plus the results. |
 | `tests/` | Automated tests for the file handling and the scoring code. All images and PDFs are generated in code. |
 | `run.ps1` | Starts the API with our tested settings. |
 | `start_ollama.ps1` | Starts Ollama with flash attention and a smaller cache, which lets the 8B model fit fully on an 8 GB GPU. |
@@ -75,12 +94,13 @@ ocr_model/
 - Built the FastAPI app (`main.py`, `schemas.py`) with image, PDF and Word endpoints and the downloadable `.txt` result.
 - Tuned GPU memory so the 8B model runs 100% on the GPU, and wrote the start scripts.
 - Added Word (.docx) support and its tests.
+- Installed and tested Baidu's Unlimited-OCR-2 on Windows, and compared it with Qwen on the same English pages (accuracy, speed and GPU memory).
 
 **Intern 2: Disha**
 - Wrote the file handling in `utils/` (`errors.py`, `image_utils.py`, `pdf_utils.py`, `docx_utils.py`): validation, image cleanup and PDF conversion.
 - Wrote the automated tests (more than 70) for these modules.
 - Wrote the evaluation tool `eval/evaluate.py` (CER and WER) and `eval/make_samples.py`.
-- Prepared the Hindi, Bengali and English test set (printed and handwritten pages with typed reference text).
+- Prepared the Hindi, Bengali and English test set (printed and handwritten pages with typed reference text), including the English cursive handwriting set (6 pages).
 - Ran the accuracy tests on the Hindi, Bengali and English pages and wrote the results.
 - Wrote the final version of this README.
 
@@ -162,25 +182,26 @@ Set these before `uvicorn` starts (they are already in `run.ps1`).
 - **One page at a time.** With a single GPU, requests are processed one after another. A page takes about 6 to 15 seconds, so long PDFs take a few minutes.
 - **Handwriting needs a human check.** When a handwritten word is unclear, the model sometimes writes a *different but real* word, so the text looks correct while the meaning is wrong.
 - **Dense pages** can be cut off by the 4096-token context. Raising it needs more VRAM.
-- **Small test set.** Each group in our results has only 5 pages, so the numbers will move as we add more.
+- **Small test set.** Each group in our results has only 5 or 6 pages, so the numbers will move as we add more.
 - **Word files:** text boxes, headers, footers and images inside tables are not read, and the old `.doc` format is not supported.
 - **Size limits:** images up to 10 MB, PDFs and Word files up to 20 MB.
 
 ## Results
 
-Each page was compared with text typed by hand from the same image. All 25 test pages (5 per group) were scored. A page usually takes about 6 to 15 seconds, and the first page after starting the model is slower because the model has to load.
+Each page was compared with text typed by hand from the same image. All 31 test pages were scored (5 per group, and 6 for English cursive). A page usually takes about 6 to 15 seconds, and the first page after starting the model is slower because the model has to load.
 
 | Document type | Pages | CER | WER | Accuracy (1 − CER) |
 |---|---:|---:|---:|---:|
 | Bengali, printed | 5 | 0.0035 | 0.0139 | **99.7%** |
 | English, printed | 5 | 0.0031 | 0.0184 | **99.7%** |
 | Hindi, printed | 5 | 0.0146 | 0.0564 | **98.5%** |
+| English, cursive handwriting | 6 | 0.0360 | 0.0859 | **96.4%** |
 | Bengali, handwritten | 5 | 0.0895 | 0.2053 | **91.1%** |
 | Hindi, handwritten | 5 | 0.1126 | 0.3047 | **88.7%** |
 
 **CER** (character error rate) is the share of characters the model got wrong, and **WER** (word error rate) is the same for whole words. Lower is better, and accuracy here means 1 − CER.
 
-Handwriting varies from page to page, depending on the writer. Handwritten Bengali ranged from about 80% to 99.5% character accuracy per page, and handwritten Hindi from about 81% to 96%. For handwriting, about one word in five (Bengali) to one word in three (Hindi) came out wrong.
+Handwriting varies from page to page, depending on the writer. English cursive was the easiest handwriting for the model. Handwritten Bengali ranged from about 80% to 99.5% character accuracy per page, and handwritten Hindi from about 81% to 96%. For handwriting, about one word in eleven (English), one in five (Bengali) and one in three (Hindi) came out wrong.
 
 ### Why the handwriting results are lower
 
@@ -193,5 +214,5 @@ We also tested image enhancement, larger images, line-by-line reading and upscal
 
 1. **Fine-tune the model on Bengali and Hindi handwriting.** This is the change most likely to raise handwriting accuracy. It would use public handwriting datasets (for example BN-HTRd for Bengali) and our own pages with typed text, trained on a cloud GPU, and checked on pages the model has never seen.
 2. **Collect more test pages**, so the numbers are more reliable.
-3. **Try a larger model** on stronger hardware, if one becomes available.
+3. **Try a larger model** on stronger hardware, if one becomes available. Unlimited-OCR-2 could also be re-tested on a bigger GPU, though it does not support Bengali or Hindi.
 4. **Add a human review step** for handwritten documents, and ask people to photograph pages flat, in even light, with the text filling the frame.
