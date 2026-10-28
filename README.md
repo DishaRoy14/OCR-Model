@@ -10,7 +10,7 @@ We used a **pretrained vision-language model, Qwen3-VL 8B**, running locally thr
 
 The app has **two interchangeable OCR engines**, chosen with the `OCR_BACKEND` setting:
 
-| `OCR_BACKEND` | Engine | Languages | Use it for |
+| `OCR_BACKEND` | Engine | Languages | Used for |
 |---|---|---|---|
 | `qwen` (default) | Qwen3-VL 8B through Ollama | Bengali, Hindi, English | Everything. This is the main engine |
 | `uocr` | Baidu Unlimited-OCR-2, loaded directly in Python | English only | Comparison and English-only use |
